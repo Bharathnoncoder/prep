@@ -1,0 +1,193 @@
+1. reduce
+// 1. No identity — returns Optional
+Optional<T> reduce(BinaryOperator<T> accumulator)
+
+// 2. With identity — returns T
+T reduce(T identity, BinaryOperator<T> accumulator)
+
+// 3. With identity + combiner — result type can differ
+U reduce(U identity, BiFunction<U,T,U> accumulator, BinaryOperator<U> combiner)
+
+2. collect
+// 1. Raw collect
+R collect(Supplier<R> supplier, BiConsumer<R,T> accumulator, BiConsumer<R,R> combiner)
+
+// 2. With Collector
+R collect(Collector<T,A,R> collector)
+
+3. Collectors.toList()
+// 1. Basic
+Collectors.toList()
+// → List<T>
+
+// 2. Unmodifiable (Java 10+)
+Collectors.toUnmodifiableList()
+// → unmodifiable List<T>
+
+4. Collectors.toSet()
+    // 1. Basic
+    Collectors.toSet()
+    // → Set<T>
+
+    // 2. Unmodifiable (Java 10+)
+    Collectors.toUnmodifiableSet()
+    // → unmodifiable Set<T>
+
+5. Collectors.toMap()
+   // 1. Basic — throws on duplicate keys
+   Collectors.toMap(
+       Function<T,K> keyMapper,
+       Function<T,V> valueMapper
+   )
+   // → Map<K,V>
+
+   // 2. With merge — handles duplicate keys
+   Collectors.toMap(
+       Function<T,K> keyMapper,
+       Function<T,V> valueMapper,
+       BinaryOperator<V> mergeFunction
+   )
+   // → Map<K,V>
+
+   // 3. With merge + custom map type
+   Collectors.toMap(
+       Function<T,K> keyMapper,
+       Function<T,V> valueMapper,
+       BinaryOperator<V> mergeFunction,
+       Supplier<Map<K,V>> mapFactory
+   )
+   // → custom Map<K,V>
+
+   // 4. Unmodifiable (Java 10+)
+   Collectors.toUnmodifiableMap(keyMapper, valueMapper)
+   Collectors.toUnmodifiableMap(keyMapper, valueMapper, mergeFunction)
+
+6. Collectors.groupingBy()
+   // 1. Basic — groups into Map<K, List<T>>
+   Collectors.groupingBy(
+       Function<T,K> classifier
+   )
+   // → Map<K, List<T>>
+
+   // 2. With downstream collector
+   Collectors.groupingBy(
+       Function<T,K> classifier,
+       Collector<T,A,D> downstream
+   )
+   // → Map<K, D>
+
+   // 3. With custom map type + downstream
+   Collectors.groupingBy(
+       Function<T,K> classifier,
+       Supplier<Map<K,D>> mapFactory,
+       Collector<T,A,D> downstream
+   )
+   // → custom Map<K, D>
+
+   // 4. Concurrent (for parallel streams)
+   Collectors.groupingByConcurrent(classifier)
+   Collectors.groupingByConcurrent(classifier, downstream)
+   Collectors.groupingByConcurrent(classifier, mapFactory, downstream)
+
+7. Collectors.partitioningBy()
+   // 1. Basic — splits into true/false lists
+   Collectors.partitioningBy(
+       Predicate<T> predicate
+   )
+   // → Map<Boolean, List<T>>
+
+   // 2. With downstream collector
+   Collectors.partitioningBy(
+       Predicate<T> predicate,
+       Collector<T,A,D> downstream
+   )
+   // → Map<Boolean, D>
+
+8. Collectors.joining()
+   // 1. Just concatenate
+   Collectors.joining()
+   // → "javaiscool"
+
+   // 2. With separator
+   Collectors.joining(CharSequence delimiter)
+   // → "java-is-cool"
+
+   // 3. With separator + prefix + suffix
+   Collectors.joining(
+       CharSequence delimiter,
+       CharSequence prefix,
+       CharSequence suffix
+   )
+   // → "[java-is-cool]"
+
+9. Collectors.counting()
+   Collectors.counting()
+   // → Long (count of elements)
+
+10. Collectors.mapping()
+   Collectors.mapping(
+       Function<T,U> mapper,
+       Collector<U,A,R> downstream
+   )
+   // → R (transforms elements before collecting)
+
+11. Collectors.filtering() (Java 9+)
+   Collectors.filtering(
+       Predicate<T> predicate,
+       Collector<T,A,R> downstream
+   )
+   // → R (filters elements before collecting)
+
+12. Collectors.teeing() (Java 12+)
+  Collectors.teeing(
+      Collector<T,A,R1> downstream1,
+      Collector<T,A,R2> downstream2,
+      BiFunction<R1,R2,R> merger
+  )
+  // → R (runs two collectors, merges results)
+
+13. Collectors.summingInt/Long/Double()
+
+  Collectors.summingInt(ToIntFunction<T> mapper)
+  Collectors.summingLong(ToLongFunction<T> mapper)
+  Collectors.summingDouble(ToDoubleFunction<T> mapper)
+  // → Int/Long/Double sum
+
+14. Collectors.averagingInt/Long/Double()
+   Collectors.averagingInt(ToIntFunction<T> mapper)
+   Collectors.averagingLong(ToLongFunction<T> mapper)
+   Collectors.averagingDouble(ToDoubleFunction<T> mapper)
+   // → Double average
+
+15. Collectors.summarizingInt/Long/Double()
+  Collectors.summarizingInt(ToIntFunction<T> mapper)
+  Collectors.summarizingLong(ToLongFunction<T> mapper)
+  Collectors.summarizingDouble(ToDoubleFunction<T> mapper)
+  // → IntSummaryStatistics / LongSummaryStatistics / DoubleSummaryStatistics
+  // gives: count, sum, min, max, average all at once
+
+16. Collectors.minBy() / maxBy()
+    Collectors.minBy(Comparator<T> comparator)
+    Collectors.maxBy(Comparator<T> comparator)
+    // → Optional<T>
+
+17. Collectors.toCollection()
+   Collectors.toCollection(Supplier<C> collectionFactory)
+   // → custom Collection type
+
+   // example
+   .collect(Collectors.toCollection(LinkedList::new))
+   .collect(Collectors.toCollection(TreeSet::new))
+
+18. Collectors.collectingAndThen()
+   Collectors.collectingAndThen(
+       Collector<T,A,R> downstream,
+       Function<R,RR> finisher
+   )
+   // → applies finisher function after collecting
+
+   // example — collect then make unmodifiable
+   .collect(Collectors.collectingAndThen(
+       Collectors.toList(),
+       Collections::unmodifiableList
+   ))
