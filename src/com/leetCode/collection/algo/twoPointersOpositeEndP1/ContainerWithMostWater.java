@@ -13,7 +13,7 @@ public class ContainerWithMostWater {
 
     }
 
-    public static int maxContainer(int[] arr){
+    public static int maxContainer(int[] arr) {
         int max = 0;
         int left = 0;
         int right = arr.length -1;
