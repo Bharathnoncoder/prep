@@ -13,6 +13,18 @@ public class ContainerWithMostWater {
 
     }
 
+
+//    🧠 Important Insight (this is what interviewers care about)
+//
+//    Why move the smaller height pointer?
+//
+//    Because:
+//
+//    Area = width × min(height)
+//    Width always decreases
+//    So only way to increase area is to find a taller line
+//    Moving the taller one is useless → height won’t improve
+
     public static int maxContainer(int[] arr) {
         int max = 0;
         int left = 0;
